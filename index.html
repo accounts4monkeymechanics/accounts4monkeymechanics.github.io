@@ -133,6 +133,77 @@
     }
   }
 </script>
+  <!-- At the very end of login.html, before </body> -->
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<script>
+  // Firebase config + init
+  const firebaseConfig = {
+    apiKey: "AIzaSyCF3esrFmnrLo3czErYRy1wkbRqEZfHliY",
+    authDomain: "monkeymechanicsaccounts.firebaseapp.com",
+    projectId: "monkeymechanicsaccounts",
+    storageBucket: "monkeymechanicsaccounts.firebasestorage.app",
+    messagingSenderId: "210326823006",
+    appId: "1:210326823006:web:28d87c66a7d1c5a35594cf"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // --- Signup function ---
+  async function signup() { ... }
+
+  // --- Login function ---
+  async function login() {
+    ...
+    if(!user.emailVerified){
+      document.getElementById('resendBtn').style.display = "block";
+      msg.textContent = "Please verify your email first!";
+      msg.style.color = "red";
+      auth.signOut();
+      return;
+    } else {
+      document.getElementById('resendBtn').style.display = "none";
+    }
+    ...
+  }
+
+  // --- Resend verification function ---
+  async function resendVerification() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPass').value.trim();
+    const msg = document.getElementById('resendMessage');
+
+    if (!email || !password) {
+      msg.textContent = "Enter email and password first!";
+      msg.style.color = "red";
+      return;
+    }
+
+    try {
+      const userCredential = await auth.signInWithEmailAndPassword(email, password);
+      const user = userCredential.user;
+
+      if(user.emailVerified){
+        msg.textContent = "Email already verified!";
+        msg.style.color = "green";
+      } else {
+        await user.sendEmailVerification();
+        msg.textContent = "Verification email sent!";
+        msg.style.color = "green";
+      }
+
+      await auth.signOut();
+    } catch(error){
+      msg.textContent = error.message;
+      msg.style.color = "red";
+    }
+  }
+</script>
+
 
 </body>
 </html>
